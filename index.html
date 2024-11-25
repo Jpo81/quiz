@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de Empreendedorismo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        #quiz-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .question {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .answers {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .answers li {
+            margin-bottom: 1cm; /* Espaçamento de 1 cm entre as alternativas */
+        }
+
+        .answers button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%; /* Faz os botões ocuparem toda a largura disponível */
+        }
+
+        .answers button:hover {
+            background: #45a049;
+        }
+
+        #result {
+            display: none;
+            margin-top: 20px;
+        }
+
+        #result img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Estilos para a caixa de entrada de nome */
+        #name-container {
+            margin-bottom: 20px;
+        }
+
+        #name-container input {
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        #start-button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #start-button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div id="quiz-container">
+        <!-- Caixa para inserir o nome antes de começar -->
+        <div id="name-container">
+            <input type="text" id="name" placeholder="Digite seu nome">
+            <button id="start-button" onclick="startQuiz()">Começar</button>
+        </div>
+
+        <div id="question-container" style="display:none;">
+            <div class="question" id="question">Pergunta vai aqui</div>
+            <ul class="answers" id="answers"></ul>
+        </div>
+        
+        <div id="result">
+            <h2>Parabéns, <span id="user-name"></span>!</h2>
+            <img src="https://via.placeholder.com/300x200.png?text=VOC%C3%8A+GANHOU" alt="Você ganhou!">
+            <h2>Procure um integrante do grupo para receber uma recompensa! (1 por pessoa)</h2>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            { question: "a análise FOFA é composta por?", answers: ["forças, fraquezas, oportunidades e ameaças", "medos, malandragem, malícia e segurança ", "forças ,medos, oportunidades e segurança"], correct: 0 },
+            { question: "qual das alternativas abaixo representam as ameaças de uma empresa:", answers: ["Desastres naturais ,clientes fiéis ,falta de funcionários", "Concorrência,falta de funcionários, uma boa situaçao financeira ", "concorrência, falta de dinheiro, desastres naturais"], correct: 2 },
+            { question: "o que é uma startup?", answers: ["é uma grande empresa e muito bem colocada no mercado tecnológico e financeiro ", "é uma empresa que acabou de começar e que busca crescimento no mercado tecnológico e financeiro ", "startups são empresas que faliram recentemente mostrando como o mundo empreendedor pode ser cruel"], correct: 1 },
+            { question: "Quais das alternativas abaixo representam as forças de uma empresa?", answers: ["pouco funcionário", "Dinheiro ralo", "equipe competente"], correct: 2 },
+            { question: "quais são as características de uma empresa de sucesso?", answers: ["Maior Venda Possível falta de visão de futuro e poucas estratégias", "medo de tentar fazer alguma coisa nova por achar que  vai fracassar", "Inovaçao frequente, adaptabilidade e flexibilidade para o mercado"], correct: 2 },
+            { question: "Qual empresa começou com uma startup?", answers: ["Atari", "Kodak", "Uber"], correct: 2 },
+            { question: "O que é uma franquia?", answers: ["o direito de uso da sua marca, produtos ou serviços a outro empreendedor ", "Compra de uma empresa adquirindo total direito sobre a mesma, onde o comprador pode fazer o que quiser com a empresa", "Um esquema de pirâmide"], correct: 0 },
+            { question: "É uma franquia?", answers: ["Loja do seu Zé", "McDonald's", "Mercearia da cleide"], correct: 1 },
+            { question: "O CEO é uma pessoa que?", answers: ["Da prejuízo à empresa", "comanda uma empresa", "ostenta a empresa"], correct: 1 },
+            { question: "As instituições beneficentes têm como objetivo", answers: ["Ganhar o máximo de dinheiro em cima das pessoas", "Ajudar as comunidades com alto valor monetária", "reparar problemas sociais"], correct: 2 },
+        ];
+
+        let currentQuestion = 0;
+        let userName = '';
+
+        const questionElement = document.getElementById("question");
+        const answersElement = document.getElementById("answers");
+        const resultElement = document.getElementById("result");
+        const nameInput = document.getElementById("name");
+        const nameContainer = document.getElementById("name-container");
+        const questionContainer = document.getElementById("question-container");
+        const userNameElement = document.getElementById("user-name");
+
+        function startQuiz() {
+            userName = nameInput.value.trim();
+            if (userName !== "") {
+                nameContainer.style.display = "none";
+                questionContainer.style.display = "block";
+                loadQuestion();
+            } else {
+                alert("Por favor, insira seu nome!");
+            }
+        }
+
+        function loadQuestion() {
+            if (currentQuestion < quizData.length) {
+                const currentData = quizData[currentQuestion];
+                questionElement.textContent = currentData.question;
+                answersElement.innerHTML = "";
+                currentData.answers.forEach((answer, index) => {
+                    const button = document.createElement("button");
+                    button.textContent = answer;
+                    button.addEventListener("click", () => checkAnswer(index));
+                    const listItem = document.createElement("li");
+                    listItem.appendChild(button);
+                    answersElement.appendChild(listItem);
+                });
+            } else {
+                showResult();
+            }
+        }
+
+        function checkAnswer(selected) {
+            if (selected === quizData[currentQuestion].correct) {
+                currentQuestion++;
+                loadQuestion();
+            } else {
+                restartQuiz();
+            }
+        }
+
+        function restartQuiz() {
+            alert("Resposta errada! O quiz será reiniciado.");
+            currentQuestion = 0;
+            loadQuestion();
+        }
+
+        function showResult() {
+            questionElement.style.display = "none";
+            answersElement.style.display = "none";
+            resultElement.style.display = "block";
+            userNameElement.textContent = userName;
+        }
+    </script>
+</body>
+</html>
